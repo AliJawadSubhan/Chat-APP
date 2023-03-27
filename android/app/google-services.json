@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1073156168381",
+    "project_id": "chatone-234bd",
+    "storage_bucket": "chatone-234bd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1073156168381:android:dafb6ad5cda0cc71fdf5d4",
+        "android_client_info": {
+          "package_name": "com.example.onechat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1073156168381-eilmfvjv9q66o8rdv4pc7mtr1e05meuj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCln36ImTTl-jJKx10LBx3J4EYZeKX_AMk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1073156168381-eilmfvjv9q66o8rdv4pc7mtr1e05meuj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
