@@ -6,7 +6,11 @@ class UserModel {
   // String password;
   String? profilepictureURL;
 
-  UserModel({this.uid, this.email, this.name, this.profilepictureURL});
+  UserModel(
+      {required this.uid,
+      required this.email,
+      required this.name,
+      required this.profilepictureURL});
 
   UserModel.fromMap(Map<String, dynamic> map) {
     uid = map['uid'];

@@ -57,7 +57,7 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                           width: 2,
                         ),
                       ),
-                      child: Icon(
+                      child: const Icon(
                         Icons.camera_alt,
                         color: Colors.white,
                         size: 20,

@@ -1,4 +1,11 @@
+import 'dart:html';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:onechat/const.dart';
+import 'package:onechat/model/user_models.dart';
 import 'package:onechat/views/signup_view.dart';
 
 class LoginView extends StatefulWidget {
@@ -11,6 +18,40 @@ class LoginView extends StatefulWidget {
 
 class _LoginViewState extends State<LoginView> {
   bool _passwordVisible = false;
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
+  void validator() {
+    String email = emailController.text.trim();
+    String password = passwordController.text.trim();
+    if (email == '' || password == '') {
+    } else {
+      print('successful');
+      login(email, password);
+    }
+  }
+
+  login(String email, String password) async {
+    UserCredential? user;
+    try {
+      user = await firebaseAuth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+    } on FirebaseAuthException catch (e) {
+      print('Failed with error code: ${e.code}');
+      print(e.message);
+    }
+    if (user != null) {
+      String uid = user.user!.uid;
+      DocumentSnapshot userData =
+          await firebaseFirestore.collection('users').doc(uid).get();
+      UserModel userModel = UserModel.fromMap(
+        userData.data() as Map<String, dynamic>,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,6 +95,7 @@ class _LoginViewState extends State<LoginView> {
                   ),
                   const SizedBox(height: 40.0),
                   TextFormField(
+                    controller: emailController,
                     decoration: InputDecoration(
                       hintText: 'Email',
                       hintStyle: const TextStyle(color: Colors.purple),
@@ -76,10 +118,11 @@ class _LoginViewState extends State<LoginView> {
                   ),
                   const SizedBox(height: 20.0),
                   TextFormField(
+                    controller: passwordController,
                     obscureText: _passwordVisible,
                     decoration: InputDecoration(
                       hintText: 'Password',
-                      hintStyle: TextStyle(color: Colors.purple),
+                      hintStyle: const TextStyle(color: Colors.purple),
                       prefixIcon: IconButton(
                           onPressed: () {
                             setState(() {
@@ -106,8 +149,8 @@ class _LoginViewState extends State<LoginView> {
                       setState(() {});
                     },
                   ),
-                  SizedBox(height: 40.0),
-                  Container(
+                  const SizedBox(height: 40.0),
+                  SizedBox(
                     width: double.infinity,
                     height: 60.0,
                     child: ElevatedButton(

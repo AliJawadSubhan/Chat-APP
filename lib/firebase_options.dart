@@ -69,7 +69,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1073156168381',
     projectId: 'chatone-234bd',
     storageBucket: 'chatone-234bd.appspot.com',
-    iosClientId: '1073156168381-irmdu1cv3985b1r3vvuog9ut3f3cauoi.apps.googleusercontent.com',
+    iosClientId:
+        '1073156168381-irmdu1cv3985b1r3vvuog9ut3f3cauoi.apps.googleusercontent.com',
     iosBundleId: 'com.example.onechat',
   );
 }

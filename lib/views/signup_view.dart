@@ -1,4 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:onechat/const.dart';
+import 'package:onechat/model/user_models.dart';
+import 'package:onechat/views/complete_profile.dart';
 
 class SignupView extends StatefulWidget {
   @override
@@ -8,6 +12,51 @@ class SignupView extends StatefulWidget {
 class _SignupViewState extends State<SignupView> {
   bool _passwordVisible = false;
   bool _confirmPasswordVisible = false;
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
+
+  void validator() {
+    String email = emailController.text.trim();
+    String password = passwordController.text.trim();
+    String confirmPassword = confirmPasswordController.text.trim();
+    if (email == '' || password == '' || confirmPassword == '') {
+    } else if (password != confirmPassword) {
+      print('Password Doesn\'t match');
+    } else {
+      print('successful');
+      signUp(email, password);
+    }
+  }
+
+  signUp(String email, String password) async {
+    UserCredential? user;
+    try {
+      user = await firebaseAuth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+    } on FirebaseAuthException catch (e) {
+      print('Failed with error code: ${e.code}');
+      print(e.message);
+    }
+    if (user != null) {
+      String uid = user.user!.uid;
+      UserModel data = UserModel(
+        uid: uid,
+        email: email,
+        name: "",
+        profilepictureURL: "",
+      );
+      await firebaseFirestore
+          .collection('users')
+          .doc(uid)
+          .set(
+            data.toMap(),
+          )
+          .then((value) => print('New User Created '));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +98,7 @@ class _SignupViewState extends State<SignupView> {
                   ),
                   const SizedBox(height: 40.0),
                   TextFormField(
+                    controller: emailController,
                     decoration: InputDecoration(
                       hintText: 'Email',
                       hintStyle: const TextStyle(color: Colors.black),
@@ -70,6 +120,7 @@ class _SignupViewState extends State<SignupView> {
                   ),
                   const SizedBox(height: 20.0),
                   TextFormField(
+                    controller: passwordController,
                     obscureText: !_passwordVisible,
                     decoration: InputDecoration(
                       hintText: 'Password',
@@ -89,11 +140,11 @@ class _SignupViewState extends State<SignupView> {
                         },
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
+                        borderSide: const BorderSide(color: Colors.white),
                         borderRadius: BorderRadius.circular(30.0),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
+                        borderSide: const BorderSide(color: Colors.white),
                         borderRadius: BorderRadius.circular(30.0),
                       ),
                       filled: true,
@@ -105,6 +156,7 @@ class _SignupViewState extends State<SignupView> {
                   ),
                   const SizedBox(height: 20.0),
                   TextFormField(
+                    controller: confirmPasswordController,
                     obscureText: !_confirmPasswordVisible,
                     decoration: InputDecoration(
                       hintText: 'Confirm Password',
@@ -151,6 +203,12 @@ class _SignupViewState extends State<SignupView> {
                       ),
                       onPressed: () {
 // Perform signup
+                        validator();
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //       builder: (context) => CompleteProfileView()),
+                        // );
                       },
                       child: const Text(
                         'Sign Up',
