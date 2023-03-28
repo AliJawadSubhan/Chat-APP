@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:onechat/views/signup_view.dart';
 
 class LoginView extends StatefulWidget {
+  const LoginView({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _LoginViewState createState() => _LoginViewState();
 }
 
 class _LoginViewState extends State<LoginView> {
+  bool _passwordVisible = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,8 +25,11 @@ class _LoginViewState extends State<LoginView> {
                 height: MediaQuery.of(context).size.height * 0.6,
                 width: MediaQuery.of(context).size.width * 0.8,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.purple, Colors.pink],
+                  gradient: const LinearGradient(
+                    colors: [
+                      Colors.purple,
+                      Colors.pink,
+                    ],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                   ),
@@ -47,7 +55,7 @@ class _LoginViewState extends State<LoginView> {
                   const SizedBox(height: 40.0),
                   TextFormField(
                     decoration: InputDecoration(
-                      hintText: 'Username',
+                      hintText: 'Email',
                       hintStyle: const TextStyle(color: Colors.purple),
                       prefixIcon:
                           const Icon(Icons.person, color: Colors.purple),
@@ -68,11 +76,21 @@ class _LoginViewState extends State<LoginView> {
                   ),
                   const SizedBox(height: 20.0),
                   TextFormField(
-                    obscureText: true,
+                    obscureText: _passwordVisible,
                     decoration: InputDecoration(
                       hintText: 'Password',
                       hintStyle: TextStyle(color: Colors.purple),
-                      prefixIcon: Icon(Icons.lock, color: Colors.purple),
+                      prefixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _passwordVisible = !_passwordVisible;
+                            });
+                          },
+                          icon: Icon(
+                              _passwordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: Colors.purple)),
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.purple),
                         borderRadius: BorderRadius.circular(30.0),
@@ -102,7 +120,7 @@ class _LoginViewState extends State<LoginView> {
                       onPressed: () {
                         // Perform login
                       },
-                      child: Text(
+                      child: const Text(
                         'Log In',
                         style: TextStyle(
                           fontSize: 20.0,
@@ -111,17 +129,24 @@ class _LoginViewState extends State<LoginView> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20.0),
+                  const SizedBox(height: 20.0),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('don\'t have an account?'),
+                      const Text('don\'t have an account?'),
                       TextButton(
-                          onPressed: () {},
-                          child: Text(
-                            "Sign up",
-                            style: TextStyle(color: Colors.purple),
-                          ))
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SignupView()),
+                          );
+                        },
+                        child: const Text(
+                          "Sign up",
+                          style: TextStyle(color: Colors.purple),
+                        ),
+                      ),
                     ],
                   )
                 ],
