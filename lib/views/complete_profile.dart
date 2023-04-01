@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 
 class CompleteProfileView extends StatefulWidget {
   const CompleteProfileView({super.key});
@@ -8,6 +12,61 @@ class CompleteProfileView extends StatefulWidget {
 }
 
 class _CompleteProfileViewState extends State<CompleteProfileView> {
+  File? imageFile;
+  TextEditingController nameController = TextEditingController();
+
+  void selectImage(ImageSource source) async {
+    XFile? pickedFile = await ImagePicker().pickImage(source: source);
+
+    if (pickedFile != null) {
+      cropImage(pickedFile);
+    }
+  }
+
+  void cropImage(XFile file) async {
+    File? croppedImage = await ImageCropper().cropImage(
+        sourcePath: file.path,
+        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+        compressQuality: 20) as File;
+
+    if (croppedImage != null) {
+      setState(() {
+        imageFile = croppedImage;
+      });
+    }
+  }
+
+  void showPicOptions() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Upload Profile Picture"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  onTap: () {
+                    selectImage(ImageSource.gallery);
+                    Navigator.pop(context);
+                  },
+                  trailing: const Icon(Icons.photo),
+                  title: const Text("Select from Gallery"),
+                ),
+                ListTile(
+                  onTap: () async {
+                    Navigator.pop(context);
+                    selectImage(ImageSource.camera);
+                  },
+                  trailing: const Icon(Icons.camera_alt),
+                  title: const Text("Take a photo"),
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,17 +93,9 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                 Stack(
                   alignment: Alignment.bottomRight,
                   children: [
-                    Container(
-                      width: 120,
-                      height: 120,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                          image: NetworkImage(
-                              'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+                    CircleAvatar(
+                      radius: 60,
+                      backgroundImage: FileImage(imageFile!),
                     ),
                     Container(
                       width: 36,
@@ -57,10 +108,15 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                           width: 2,
                         ),
                       ),
-                      child: const Icon(
-                        Icons.camera_alt,
-                        color: Colors.white,
-                        size: 20,
+                      child: IconButton(
+                        onPressed: () {
+                          showPicOptions();
+                        },
+                        icon: const Icon(
+                          Icons.camera_alt,
+                          color: Colors.white,
+                          size: 15,
+                        ),
                       ),
                     ),
                   ],
@@ -69,6 +125,9 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                   height: 24,
                 ),
                 TextFormField(
+                  controller: nameController,
+                  // textInputAction: ,
+                  // keyboardType: TextInputType.e,
                   decoration: InputDecoration(
                     hintText: 'User Name',
                     hintStyle: TextStyle(
@@ -84,7 +143,7 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                       borderRadius: BorderRadius.circular(30.0),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         color: Colors.blue,
                         width: 2,
                       ),
@@ -93,6 +152,7 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                     filled: true,
                     fillColor: Colors.white.withOpacity(0.3),
                   ),
+                  // Unhandled Exception: type 'CroppedFile' is not a subtype of type 'File' in type cast
                   onChanged: (value) {
                     setState(() {});
                   },
@@ -105,7 +165,7 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                   height: 48,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.blue,
+                      backgroundColor: Colors.blue,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30.0),
                       ),

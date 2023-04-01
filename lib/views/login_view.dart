@@ -1,8 +1,6 @@
-import 'dart:html';
-
+//
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:onechat/const.dart';
 import 'package:onechat/model/user_models.dart';
@@ -38,6 +36,7 @@ class _LoginViewState extends State<LoginView> {
         email: email,
         password: password,
       );
+      print('Wowwwwwwwwwww');
     } on FirebaseAuthException catch (e) {
       print('Failed with error code: ${e.code}');
       print(e.message);
@@ -112,9 +111,7 @@ class _LoginViewState extends State<LoginView> {
                       filled: true,
                       fillColor: Colors.white.withOpacity(0.2),
                     ),
-                    onChanged: (value) {
-                      setState(() {});
-                    },
+                    onChanged: (value) {},
                   ),
                   const SizedBox(height: 20.0),
                   TextFormField(
@@ -161,6 +158,7 @@ class _LoginViewState extends State<LoginView> {
                         primary: Colors.white,
                       ),
                       onPressed: () {
+                        validator();
                         // Perform login
                       },
                       child: const Text(
