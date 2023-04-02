@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:onechat/views/complete_profile.dart';
+import 'package:onechat/views/login_view.dart';
 
 import 'firebase_options.dart';
 
@@ -19,9 +20,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'Flutter Demo',
-      home: CompleteProfileView(),
-    );
+    return const MaterialApp(title: 'Flutter Demo', home: LoginView());
   }
 }

@@ -54,7 +54,13 @@ class _SignupViewState extends State<SignupView> {
           .set(
             data.toMap(),
           )
-          .then((value) => print('New User Created '));
+          .then((value) {
+        print('New User Created ');
+        Navigator.push(context, MaterialPageRoute(builder: (ctz) {
+          return CompleteProfileView(
+              initals: 'Picture', userModel: data, user: user!.user!);
+        }));
+      });
     }
   }
 
