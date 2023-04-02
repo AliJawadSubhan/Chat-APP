@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:onechat/const.dart';
 import 'package:onechat/model/user_models.dart';
+import 'package:onechat/views/home_view.dart';
 import 'package:onechat/views/signup_view.dart';
 
 class LoginView extends StatefulWidget {
@@ -48,6 +49,15 @@ class _LoginViewState extends State<LoginView> {
       UserModel userModel = UserModel.fromMap(
         userData.data() as Map<String, dynamic>,
       );
+      // ignore: use_build_context_synchronously
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomeView(
+              userModel: userModel,
+              user: user!.user!,
+            ),
+          ));
     }
   }
 

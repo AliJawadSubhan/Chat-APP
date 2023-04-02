@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:onechat/const.dart';
 import 'package:onechat/helpers/image_helper.dart';
 import 'package:onechat/model/user_models.dart';
+import 'package:onechat/views/home_view.dart';
 
 final imageHelper = ImageHelper();
 
@@ -27,16 +28,6 @@ class CompleteProfileView extends StatefulWidget {
 class _CompleteProfileViewState extends State<CompleteProfileView> {
   File? imageFile;
   TextEditingController nameController = TextEditingController();
-
-  // void selectImage(ImageSource source) async {
-  //   XFile? pickedFile = await ImagePicker().pickImage(source: source);
-
-  //   if (pickedFile != null) {
-  //     setState(() {
-  //       imageFile = pickedFile;
-  //     });
-  //   }
-  // }
 
   void checkValue() {
     String username = nameController.text.trim();
@@ -64,7 +55,17 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
         .set(
           widget.userModel.toMap(),
         )
-        .then((value) => print('Data Uploaded'));
+        .then((value) {
+      print('Data Uploaded');
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomeView(
+              userModel: widget.userModel,
+              user: widget.user,
+            ),
+          ));
+    });
   }
 
   void showPicOptions() {
@@ -136,6 +137,7 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                       );
                     });
                   }
+                  // log('');
                   // ignore: use_build_context_synchronously
                   Navigator.pop(context);
                 },
