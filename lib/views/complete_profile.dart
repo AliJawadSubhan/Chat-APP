@@ -280,7 +280,7 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                         child: const Text(
                           'SAVE',
                           style: TextStyle(
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w400,
                             fontSize: 22,
                             color: Colors.white,
                           ),
