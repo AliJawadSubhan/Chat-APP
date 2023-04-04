@@ -1,10 +1,9 @@
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:onechat/const.dart';
 import 'package:onechat/views/login_view.dart';
+import 'package:onechat/views/search_view.dart';
 import '../model/user_models.dart';
 
 class HomeView extends StatefulWidget {
@@ -61,8 +60,7 @@ class _HomeViewState extends State<HomeView> {
                 List<UserModel> users = [];
                 if (snapshot.data?.docs != null) {
                   for (var documentSnapshot in snapshot.data!.docs) {
-                    Map<String, dynamic> data =
-                        documentSnapshot.data() as Map<String, dynamic>;
+                    var data = documentSnapshot.data() as Map<String, dynamic>;
                     UserModel user = UserModel.fromMap(data);
                     users.add(user);
                   }
@@ -148,9 +146,16 @@ class _HomeViewState extends State<HomeView> {
         child: FloatingActionButton(
           backgroundColor: Colors.purple,
           onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (ctz) => SearchView(
+                    userModel: widget.userModel, currentUser: widget.user!),
+              ),
+            );
             // do something when the button is pressed
           },
-          child: Icon(Icons.search),
+          child: const Icon(Icons.search),
         ),
       ),
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
