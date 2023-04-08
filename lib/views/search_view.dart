@@ -1,8 +1,16 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:onechat/const.dart';
+import 'package:onechat/main.dart';
+import 'package:onechat/model/chat_model.dart';
 import 'package:onechat/model/user_models.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:onechat/views/chatroom_view.dart';
+// import 'package:onechat/views/chatroom_view.dart';
+// import 'package:cached_network_image/cached_network_image.dart';
+import 'package:onechat/widgets/usercard.dart';
 
 class SearchView extends StatefulWidget {
   final UserModel userModel;
@@ -16,6 +24,47 @@ class SearchView extends StatefulWidget {
 
 class _SearchViewState extends State<SearchView> {
   TextEditingController name = TextEditingController();
+
+  Future<ChatRoomModel?> getChatroomModel(UserModel targetUser) async {
+    ChatRoomModel? chatRoom;
+
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection("chatrooms")
+        .where("participants.${widget.userModel.uid}", isEqualTo: true)
+        .where("participants.${targetUser.uid}", isEqualTo: true)
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      // Fetch the existing one
+      var docData = snapshot.docs[0].data();
+      ChatRoomModel existingChatroom =
+          ChatRoomModel.fromMap(docData as Map<String, dynamic>);
+
+      chatRoom = existingChatroom;
+    } else {
+      // Create a new one
+      ChatRoomModel newChatroom = ChatRoomModel(
+        chatroomID: uuid.v1(),
+        lastMessage: "",
+        participants: {
+          widget.userModel.uid.toString(): true,
+          targetUser.uid.toString(): true,
+        },
+      );
+
+      await FirebaseFirestore.instance
+          .collection("chatrooms")
+          .doc(newChatroom.chatroomID)
+          .set(newChatroom.toMap());
+
+      chatRoom = newChatroom;
+
+      log("New Chatroom Created!");
+    }
+
+    return chatRoom;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,6 +98,14 @@ class _SearchViewState extends State<SearchView> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(50),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
                     ),
                     child: Row(
                       children: [
@@ -69,6 +126,8 @@ class _SearchViewState extends State<SearchView> {
                                 fontSize: 18,
                               ),
                               border: InputBorder.none,
+                              contentPadding: EdgeInsets.symmetric(
+                                  vertical: 15, horizontal: 10),
                             ),
                             onChanged: (va) {
                               setState(() {});
@@ -77,7 +136,7 @@ class _SearchViewState extends State<SearchView> {
                         ),
                         IconButton(
                           onPressed: () {},
-                          icon: Icon(
+                          icon: const Icon(
                             Icons.search,
                             color: Colors.black,
                           ),
@@ -103,194 +162,126 @@ class _SearchViewState extends State<SearchView> {
                 ),
                 child: StreamBuilder<QuerySnapshot>(
                   stream: name.text.trim().isNotEmpty
-                      ? FirebaseFirestore.instance
+                      ? firebaseFirestore
                           .collection("users")
-                          .where("name", isGreaterThanOrEqualTo: name.text)
+                          .where(
+                            "name",
+                            isGreaterThanOrEqualTo: name.text.trim(),
+                          )
+                          .where('name', isNotEqualTo: widget.userModel.name)
                           .snapshots()
-                      : FirebaseFirestore.instance
+                      : firebaseFirestore
                           .collection("users")
+                          .where('name', isNotEqualTo: widget.userModel.name)
                           .snapshots(),
                   builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.active) {
-                      if (snapshot.hasData) {
-                        if (snapshot.data!.docs.length > 0) {
-                          List<UserModel> searchedUsers = [];
-                          for (var data in snapshot.data!.docs) {
-                            var datas = data.data() as Map<String, dynamic>;
-                            UserModel users = UserModel.fromMap(datas);
-                            searchedUsers.add(users);
-                          }
-                          QuerySnapshot dataSnapshot =
-                              snapshot.data as QuerySnapshot;
-                          if (dataSnapshot.docs.length > 0) {
-                            Map<String, dynamic> userMap = dataSnapshot.docs[0]
-                                .data() as Map<String, dynamic>;
-
-                            UserModel searchedUser = UserModel.fromMap(userMap);
-                            return ListView.builder(
-                                itemCount: name.text.trim().isEmpty
-                                    ? snapshot.data!.docs.length
-                                    : 1,
-                                itemBuilder: (context, idx) {
-                                  return name.text.trim().isEmpty
-                                      ? Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: UserCard(
-                                              imageUrl: searchedUsers[idx]
-                                                  .profilepictureURL
-                                                  .toString(),
-                                              username: searchedUsers[idx]
-                                                  .name
-                                                  .toString(),
-                                              email: searchedUsers[idx]
-                                                  .email
-                                                  .toString()),
-                                        )
-                                      : Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: UserCard(
-                                              imageUrl: searchedUser
-                                                  .profilepictureURL!,
-                                              username: searchedUser.name!,
-                                              email: searchedUser.email!),
-                                        );
-                                });
-                          } else {
-                            return const Text("No results found!");
-                          }
-                        } else if (snapshot.hasError) {
-                          return Text("An error occured!");
-                        } else {
-                          return Text("No results found!");
+                    if (snapshot.connectionState == ConnectionState.active &&
+                        snapshot.hasData) {
+                      if (snapshot.data!.docs.isNotEmpty) {
+                        List<UserModel> searchedUsers = [];
+                        for (var data in snapshot.data!.docs) {
+                          var datas = data.data() as Map<String, dynamic>;
+                          UserModel users = UserModel.fromMap(datas);
+                          searchedUsers.add(users);
                         }
+                        // for single user
+                        QuerySnapshot dataSnapshot =
+                            snapshot.data as QuerySnapshot;
+                        if (dataSnapshot.docs.isNotEmpty) {
+                          Map<String, dynamic> userMap = dataSnapshot.docs[0]
+                              .data() as Map<String, dynamic>;
+                          UserModel searchedUser = UserModel.fromMap(userMap);
+                          return ListView.builder(
+                              itemCount: name.text.trim().isEmpty
+                                  ? searchedUsers.length
+                                  : 1,
+                              itemBuilder: (context, idx) {
+                                return name.text.trim().isEmpty
+                                    ? Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: UserCard(
+                                            goToChatRoomButton: () async {
+                                              ChatRoomModel? chatRoomModel =
+                                                  await getChatroomModel(
+                                                      searchedUser);
+                                              if (chatRoomModel != null) {
+                                                // Navigator.pop(context);
+                                                // ignore: use_build_context_synchronously
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (ctx) =>
+                                                        ChatRoomView(
+                                                      chatRoomModel:
+                                                          chatRoomModel,
+                                                      targettedUser:
+                                                          searchedUsers[idx],
+                                                      currentUserModel:
+                                                          widget.userModel,
+                                                      currentUser:
+                                                          widget.currentUser,
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                            imageUrl: searchedUsers[idx]
+                                                .profilepictureURL
+                                                .toString(),
+                                            username: searchedUsers[idx]
+                                                .name
+                                                .toString(),
+                                            email: searchedUsers[idx]
+                                                .email
+                                                .toString()),
+                                      )
+                                    : Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: UserCard(
+                                          goToChatRoomButton: () async {
+                                            ChatRoomModel? chatRoomModel =
+                                                await getChatroomModel(
+                                                    searchedUser);
+                                            if (chatRoomModel != null) {
+                                              // ignore: use_build_context_synchronously
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (ctx) =>
+                                                      ChatRoomView(
+                                                    chatRoomModel:
+                                                        chatRoomModel,
+                                                    targettedUser: searchedUser,
+                                                    currentUserModel:
+                                                        widget.userModel,
+                                                    currentUser:
+                                                        widget.currentUser,
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          },
+                                          imageUrl: searchedUser
+                                              .profilepictureURL
+                                              .toString(),
+                                          username:
+                                              searchedUser.name.toString(),
+                                          email: searchedUser.email.toString(),
+                                        ),
+                                      );
+                              });
+                        } else {
+                          return const Text("No results found!");
+                        }
+                      } else if (snapshot.hasError) {
+                        return const Center(child: Text("An error occured!"));
+                      } else {
+                        return const Center(child: Text("No results found!"));
                       }
                     }
-                    return Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   },
                 ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class UserCard extends StatelessWidget {
-  final String imageUrl;
-  final String username;
-  final String email;
-
-  const UserCard({
-    Key? key,
-    required this.imageUrl,
-    required this.username,
-    required this.email,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10,
-            spreadRadius: 5,
-            offset: Offset(0, 5),
-          )
-        ],
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.deepPurple.withOpacity(0.8),
-            Colors.purple.withOpacity(0.6),
-          ],
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: FadeInImage.assetNetwork(
-                placeholder: 'assets/avatar_placeholder.png',
-                image: imageUrl,
-                height: 100,
-                width: 100,
-                fit: BoxFit.cover,
-              ),
-            ),
-            SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    username,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    email,
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          primary: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        child: const Text(
-                          'Profile',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          primary: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        child: const Text(
-                          'Message',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
               ),
             ),
           ],
