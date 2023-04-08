@@ -31,12 +31,12 @@ class AuthView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Widget?>(
+    return FutureBuilder(
       future: checkAuth(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Scaffold(
-              body: Center(child: const CircularProgressIndicator()));
+          return const Scaffold(
+              body: Center(child: CircularProgressIndicator()));
         } else {
           return snapshot.data ?? const LoginView();
         }

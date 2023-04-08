@@ -1,9 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:onechat/views/auth_view/auth_view.dart';
+import 'package:uuid/uuid.dart';
 
 import 'firebase_options.dart';
 
+var uuid = Uuid();
 void main() async {
   // TestWidgetsFlutterBinding.ensureInitialized();
   WidgetsFlutterBinding.ensureInitialized();

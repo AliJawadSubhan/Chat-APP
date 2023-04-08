@@ -178,12 +178,12 @@ class _SearchViewState extends State<SearchView> {
                     if (snapshot.connectionState == ConnectionState.active &&
                         snapshot.hasData) {
                       if (snapshot.data!.docs.isNotEmpty) {
-                        List<UserModel> searchedUsers = [];
-                        for (var data in snapshot.data!.docs) {
-                          var datas = data.data() as Map<String, dynamic>;
-                          UserModel users = UserModel.fromMap(datas);
-                          searchedUsers.add(users);
-                        }
+                        // List<UserModel> searchedUsers = [];
+                        // for (var data in snapshot.data!.docs) {
+                        //   var datas = data.data() as Map<String, dynamic>;
+                        //   UserModel users = UserModel.fromMap(datas);
+                        //   searchedUsers.add(users);
+                        // }
                         // for single user
                         QuerySnapshot dataSnapshot =
                             snapshot.data as QuerySnapshot;
@@ -191,85 +191,78 @@ class _SearchViewState extends State<SearchView> {
                           Map<String, dynamic> userMap = dataSnapshot.docs[0]
                               .data() as Map<String, dynamic>;
                           UserModel searchedUser = UserModel.fromMap(userMap);
-                          return ListView.builder(
-                              itemCount: name.text.trim().isEmpty
-                                  ? searchedUsers.length
-                                  : 1,
-                              itemBuilder: (context, idx) {
-                                return name.text.trim().isEmpty
-                                    ? Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: UserCard(
-                                            goToChatRoomButton: () async {
-                                              ChatRoomModel? chatRoomModel =
-                                                  await getChatroomModel(
-                                                      searchedUser);
-                                              if (chatRoomModel != null) {
-                                                // Navigator.pop(context);
-                                                // ignore: use_build_context_synchronously
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (ctx) =>
-                                                        ChatRoomView(
-                                                      chatRoomModel:
-                                                          chatRoomModel,
-                                                      targettedUser:
-                                                          searchedUsers[idx],
-                                                      currentUserModel:
-                                                          widget.userModel,
-                                                      currentUser:
-                                                          widget.currentUser,
-                                                    ),
-                                                  ),
-                                                );
-                                              }
-                                            },
-                                            imageUrl: searchedUsers[idx]
-                                                .profilepictureURL
-                                                .toString(),
-                                            username: searchedUsers[idx]
-                                                .name
-                                                .toString(),
-                                            email: searchedUsers[idx]
-                                                .email
-                                                .toString()),
-                                      )
-                                    : Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: UserCard(
-                                          goToChatRoomButton: () async {
-                                            ChatRoomModel? chatRoomModel =
-                                                await getChatroomModel(
-                                                    searchedUser);
-                                            if (chatRoomModel != null) {
-                                              // ignore: use_build_context_synchronously
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (ctx) =>
-                                                      ChatRoomView(
-                                                    chatRoomModel:
-                                                        chatRoomModel,
-                                                    targettedUser: searchedUser,
-                                                    currentUserModel:
-                                                        widget.userModel,
-                                                    currentUser:
-                                                        widget.currentUser,
-                                                  ),
+                          return name.text.trim().isEmpty
+                              ? ListView(
+                                  children: snapshot.data!.docs
+                                      .map((DocumentSnapshot document) {
+                                    Map<String, dynamic> data = document.data()!
+                                        as Map<String, dynamic>;
+                                    UserModel searchedUserData =
+                                        UserModel.fromMap(data);
+                                    return Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: UserCard(
+                                        imageUrl: searchedUserData
+                                            .profilepictureURL
+                                            .toString(),
+                                        username:
+                                            searchedUserData.name.toString(),
+                                        email:
+                                            searchedUserData.email.toString(),
+                                        goToChatRoomButton: () async {
+                                          ChatRoomModel? chatRoomModel =
+                                              await getChatroomModel(
+                                                  searchedUserData);
+                                          if (chatRoomModel != null) {
+                                            // ignore: use_build_context_synchronously
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (ctx) => ChatRoomView(
+                                                  chatRoomModel: chatRoomModel,
+                                                  targettedUser:
+                                                      searchedUserData,
+                                                  currentUserModel:
+                                                      widget.userModel,
+                                                  currentUser:
+                                                      widget.currentUser,
                                                 ),
-                                              );
-                                            }
-                                          },
-                                          imageUrl: searchedUser
-                                              .profilepictureURL
-                                              .toString(),
-                                          username:
-                                              searchedUser.name.toString(),
-                                          email: searchedUser.email.toString(),
-                                        ),
-                                      );
-                              });
+                                              ),
+                                            );
+                                          }
+                                        },
+                                      ),
+                                    );
+                                  }).toList(),
+                                )
+                              : Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: UserCard(
+                                    goToChatRoomButton: () async {
+                                      ChatRoomModel? chatRoomModel =
+                                          await getChatroomModel(searchedUser);
+                                      if (chatRoomModel != null) {
+                                        // ignore: use_build_context_synchronously
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (ctx) => ChatRoomView(
+                                              chatRoomModel: chatRoomModel,
+                                              targettedUser: searchedUser,
+                                              currentUserModel:
+                                                  widget.userModel,
+                                              currentUser: widget.currentUser,
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    imageUrl: searchedUser.profilepictureURL
+                                        .toString(),
+                                    username: searchedUser.name.toString(),
+                                    email: searchedUser.email.toString(),
+                                  ),
+                                );
                         } else {
                           return const Text("No results found!");
                         }
@@ -290,3 +283,27 @@ class _SearchViewState extends State<SearchView> {
     );
   }
 }
+
+
+
+
+/* 
+ChatRoomModel? chatRoomModel =
+                                            await getChatroomModel(
+                                                searchedUserData);
+                                        if (chatRoomModel != null) {
+                                          // ignore: use_build_context_synchronously
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (ctx) => ChatRoomView(
+                                                chatRoomModel: chatRoomModel,
+                                                targettedUser: searchedUserData,
+                                                currentUserModel:
+                                                    widget.userModel,
+                                                currentUser: widget.currentUser,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                        */
