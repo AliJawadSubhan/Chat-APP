@@ -22,9 +22,9 @@ class _SignupViewState extends State<SignupView> {
     String confirmPassword = confirmPasswordController.text.trim();
     if (email == '' || password == '' || confirmPassword == '') {
     } else if (password != confirmPassword) {
-      print('Password Doesn\'t match');
+      debugPrint('Password Doesn\'t match');
     } else {
-      print('successful');
+      debugPrint('successful');
       signUp(email, password);
     }
   }
@@ -37,8 +37,8 @@ class _SignupViewState extends State<SignupView> {
         password: password,
       );
     } on FirebaseAuthException catch (e) {
-      print('Failed with error code: ${e.code}');
-      print(e.message);
+      debugPrint('Failed with error code: ${e.code}');
+      debugPrint(e.message);
     }
     if (user != null) {
       String uid = user.user!.uid;
@@ -55,7 +55,7 @@ class _SignupViewState extends State<SignupView> {
             data.toMap(),
           )
           .then((value) {
-        print('New User Created ');
+        debugPrint('New User Created ');
         Navigator.push(context, MaterialPageRoute(builder: (ctz) {
           return CompleteProfileView(
               initals: 'Picture', userModel: data, user: user!.user!);
