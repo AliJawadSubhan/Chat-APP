@@ -12,7 +12,7 @@ A fast-paced, real-time quiz app where players compete 1v1 to answer questions t
 
 ### Sign Up Page
 
-![Sign Up Page](/assets/f07c9435-fefc-40c6-9cdd-7f4f7084d5d0 "Sign Up Page")
+![Sign Up Page](/assets/login.png "Sign Up Page")
 
 ### Lobby Page
 
