@@ -1,33 +1,41 @@
-# Simple Quiz App
+# Chat App
 
-A fast-paced, real-time quiz app where players compete 1v1 to answer questions the fastest. Built using Firebase for user authentication and Firestore for real-time database updates, it employs a Bloc pattern for scalable and maintainable code structure.
+A sleek real-time chat app with a nice UI, built with Firebase for secure login and Firestore for live messaging, providing a seamless experience.
 
 ## Features
 
-- **User Authentication:** Secure login and signup functionality with Firebase.
-- **1v1 Real-Time Player Matching:** Instantly match with another player for a quiz battle.
-- **Live Quiz Battles:** Answer quiz questions faster than your opponent in real-time.
+- **Firebase Authentication:** Users can sign up and log in securely.
+- **Real-Time Chat:** Instant messaging between users, powered by Firestore.
+- **Persistent Login:** Users are directly taken to the home page if they have previously logged in, enhancing the user experience by skipping unnecessary login steps.
 
 ## Preview
 
-### Sign Up Page
+### Login Page
 
-![Sign Up Page](/assets/login.png "Sign Up Page")
+Users can sign up or log in to access the chat functionality.
 
-### Lobby Page
+![Login Page](/assets/login.png "Login Page")
 
-Here, players wait as the app matches them with an opponent.
+### Register Page
 
-![Lobby Page](/assets/ccaa08ff-9ad8-475a-9d95-89a8c9b4f6f7 "Lobby Page")
+New users can create an account to start chatting.
 
-### Quiz Page
+![Register Page](/assets/register.png "Register Page")
 
-Both players are shown side by side as they compete in real-time.
+### Home Page
 
-![Quiz Page](/assets/4c4c41dd-1120-4bad-ab5a-9bd8c9154594 "Quiz Page")
+The home page displays available chats and contacts.
 
-## Getting Started
+![Home Page](/assets/homepage.jpeg "Home Page")
 
-To run this app locally, follow these steps:
+### Chat Page
 
-1. **Clone this repository:**
+Users can chat in real-time with others.
+
+![Chat Page](/assets/chatpage.jpeg "Chat Page")
+
+### Search
+
+Users can search for other users to start a conversation.
+
+![Search](/assets/search.png "Search")
